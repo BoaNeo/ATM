@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ATM AJAX</title>
+  <script>
+    function callService(endpoint, number, callback)
+    {
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function()
+      {
+        if (this.readyState === 4 && this.status === 200)
+        {
+          callback(this.responseText);
+        }
+      };
+      xhttp.open("GET", "http://localhost:8080/"+endpoint+"?amount="+number, true);
+      xhttp.send();
+    }
+
+    function payout()
+    {
+      let value = document.getElementById("amount").value;
+
+      callService("withdraw", value, function(out)
+      {
+        var withdrawal = JSON.parse(out);
+        var money = withdrawal.money;
+
+        var str_notes = "";
+        var str_coinsS = "";
+        var str_coinsL = "";
+        var err = withdrawal.result;
+        if(err==="Ok!")
+        {
+          for(i=0;i<money.length;i++)
+          {
+            let w = money[i];
+            let item = "<li>"+w.value+":"+w.amount+"</li>";
+
+            switch(w.type)
+            {
+              case "NOTE":      str_notes+=item; break;
+              case "LARGE_COIN": str_coinsL+=item; break;
+              case "SMALL_COIN": str_coinsS+=item; break;
+            }
+          }
+        }
+
+        document.getElementById("error").innerHTML = err;
+        document.getElementById("notes").innerHTML = "<ul>"+str_notes+"</ul>";
+        document.getElementById("coinsLarge").innerHTML = "<ul>"+str_coinsL+"</ul>";
+        document.getElementById("coinsSmall").innerHTML = "<ul>"+str_coinsS+"</ul>";
+      });
+    }
+
+  </script>
+</head>
+<body>
+
+  <input id="amount">
+  <button onclick="payout();">Payout</button>
+  <hr>
+  Notes:
+  <div id ="notes" style="border:1px solid black;">&nbsp;
+
+  </div>
+  Coins >20mm
+  <div id ="coinsLarge" style="border:1px solid black;">&nbsp;
+
+  </div>
+  Coins <= 20mm
+  <div id ="coinsSmall" style="border:1px solid black;">&nbsp;
+
+  </div>
+
+  Result
+  <div id ="error" style="border:1px solid black;">&nbsp;
+
+  </div>
+</body>
+</html>

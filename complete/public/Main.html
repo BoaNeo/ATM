@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ATM</title>
+  <script>
+    var bank=
+            [
+              { value:1000, amount: 100, type: "note"},
+              { value:500, amount: 100, type: "note"},
+              { value:200, amount: 100, type: "note"},
+              { value:100, amount: 100, type: "note"},
+              { value:50, amount: 100, type: "note"},
+              { value:20, amount: 100, type: "largeCoin"},
+              { value:10, amount: 100, type: "smallCoin"},
+              { value:5, amount: 100, type: "largeCoin"},
+              { value:2, amount: 100, type: "largeCoin"},
+              { value:1, amount: 100, type: "smallCoin"},
+            ];
+
+    function payout()
+    {
+      let value = document.getElementById("amount").value;
+      let out = [];
+
+      for(var i=0;i<bank.length;i++)
+      {
+        let v = bank[i];
+        let n = Math.floor(value / v.value);
+        if(n>v.amount)
+          n = v.amount;
+        if(n>0)
+          out.push( { count: n, vault:i });
+        value -= n*v.value;
+      }
+
+      var str_notes = "";
+      var str_coinsS = "";
+      var str_coinsL = "";
+      var err = "Ok";
+      if(value===0)
+      {
+        for(i=0;i<out.length;i++)
+        {
+          let w = out[i];
+          let item = "<li>"+bank[w.vault].value+":"+w.count+"</li>";
+          bank[w.vault].amount-=w.count;
+
+          switch(bank[w.vault].type)
+          {
+            case "note":      str_notes+=item; break;
+            case "largeCoin": str_coinsL+=item; break;
+            case "smallCoin": str_coinsS+=item; break;
+          }
+        }
+      }
+      else
+        err = "Not enough money in the bank";
+
+      document.getElementById("error").innerHTML = err;
+      document.getElementById("notes").innerHTML = "<ul>"+str_notes+"</ul>";
+      document.getElementById("coinsLarge").innerHTML = "<ul>"+str_coinsL+"</ul>";
+      document.getElementById("coinsSmall").innerHTML = "<ul>"+str_coinsS+"</ul>";
+    }
+
+  </script>
+</head>
+<body>
+
+  <input id="amount">
+  <button onclick="payout();">Payout</button>
+  <hr>
+  Notes:
+  <div id ="notes" style="border:1px solid black;">&nbsp;
+
+  </div>
+  Coins >20mm
+  <div id ="coinsLarge" style="border:1px solid black;">&nbsp;
+
+  </div>
+  Coins <= 20mm
+  <div id ="coinsSmall" style="border:1px solid black;">&nbsp;
+
+  </div>
+
+  Result
+  <div id ="error" style="border:1px solid black;">&nbsp;
+
+  </div>
+</body>
+</html>
